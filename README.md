@@ -10,16 +10,20 @@ WebApp is a minimal full-stack learning project that demonstrates an end-to-end 
 - PostgreSQL integration via `pg`
 - Password hashing and verification with `bcrypt`
 - Environment-based configuration using `.env`
+- GitHub Actions workflow configuration in `.github/workflows/deploy.yml`
 
 ## Tech Stack
 - Frontend: HTML5, CSS3 (static files in `public/`)
 - Backend: Node.js, Express.js
 - Database: PostgreSQL
-- Tools: npm, dotenv, pgAdmin (local DB management)
+- Tools: npm, dotenv, pgAdmin (local DB management), GitHub Actions
 
 ## Project Structure
 ```text
 webapp/
+├─ .github/
+│  └─ workflows/
+│     └─ deploy.yml
 ├─ public/
 │  ├─ login.html
 │  ├─ welcome.html
@@ -104,6 +108,11 @@ Passwords are stored in the database as bcrypt hashes, not plaintext.
 - `POST /auth/logout` — destroy session and log out
 - `GET /db/health` — database health check (`ok: true/false`)
 
+## CI Workflow
+This project includes a GitHub Actions workflow:
+- Workflow file: `.github/workflows/deploy.yml`
+- Purpose: automated CI/deployment pipeline configuration for repository events
+
 ## Versioning
 This project follows Semantic Versioning.
 
@@ -111,8 +120,7 @@ Current release:
 - `v0.1.0` — First functional authentication system.
 
 ## Future Improvements (Roadmap)
-- AWS deployment
-- CI/CD pipeline
+- AWS deployment target refinement for production
 - Persistent session storage (e.g., Redis/PostgreSQL-backed sessions)
 - User registration flow
 - HTTPS configuration
