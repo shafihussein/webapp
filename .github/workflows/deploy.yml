@@ -1,4 +1,4 @@
-name: Deploy to EC2 on tag
+name: Deploy to EC2 on tag (self-hosted)
 
 on:
   push:
@@ -7,39 +7,35 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Deploy over SSH
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            set -e
-            echo "Deploying tag: ${{ github.ref_name }}"
+      - name: Deploy tag to live folder and restart
+        run: |
+          set -e
 
-            cd ${{ secrets.APP_DIR }}
+          echo "Deploying tag: $GITHUB_REF_NAME"
 
-            # Ensure repo is up to date
-            git fetch --all --tags
+          cd /var/www/webapp
 
-            # Checkout the tag that triggered this deploy
-            git checkout -f ${{ github.ref_name }}
+          # Ensure we're using your repo folder and it has the latest tags
+          git fetch --all --tags
 
-            # Install exact dependencies
-            npm ci --omit=dev
+          # Checkout exactly the tag that triggered the workflow
+          git checkout -f "$GITHUB_REF_NAME"
 
-            # Restart the app (deploy user is allowed to do this)
-            sudo -u ubuntu pm2 restart webapp
+          # Deterministic install (uses package-lock.json)
+          npm ci --omit=dev
 
-            # Optional: reload nginx (safe even if not needed)
-            sudo systemctl reload nginx
+          # Restart the app
+          pm2 restart webapp
 
-            echo "Deploy complete."
+          # Reload nginx (safe even if no changes)
+          sudo systemctl reload nginx
+
+          echo "Deploy complete."
